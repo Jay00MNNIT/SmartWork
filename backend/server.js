@@ -36,7 +36,7 @@ app.use('/api/ai', aiRoutes);
 mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log('✅ MongoDB Connected Successfully!');
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT || 5000, () => {
         console.log(`✅ SmartWork Server running on port ${process.env.PORT}`);
         console.log(`✅ API Docs available at http://localhost:5000/api-docs`);
     });
