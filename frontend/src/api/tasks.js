@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getToken } from './auth';
 
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const BASE_URL = 'https://smartwork-upt0.onrender.com';
 const API_URL = `${BASE_URL}/api/tasks`;
 
 // Get auth header 

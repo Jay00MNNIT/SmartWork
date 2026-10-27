@@ -11,7 +11,7 @@ const AISuggestion = ({ onAddTask }) => {
         setLoading(true);
         setSuggestions([]);
         try {
-            const baseURL = process.env.REACT_APP_BASE_URL || 'http.//localhost:5000';
+            const baseURL = 'https://smartwork-upt0.onrender.com';
             const response = await fetch(`${baseURL}/api/ai/suggestions`, {
                 method: 'POST',
                 headers: {
