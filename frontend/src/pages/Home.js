@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import confetti from 'canvas-confetti';
 import AddTask from '../components/AddTask';
@@ -20,7 +20,7 @@ const Home = () => {
     const [category, setCategory] = useState('all');
     const [isDarkMode, setIsDarkMode] = useState(true);
     const [showStats, setShowStats] = useState(false);
-    const [user, setUser] = useState(getUser());
+    const [user] = useState(getUser());
     const navigate = useNavigate();
 
     // Fetch all tasks 

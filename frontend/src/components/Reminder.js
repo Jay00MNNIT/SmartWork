@@ -1,3 +1,4 @@
+// eslint-disable-next-line react-hooks/exhaustive-deps
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -58,6 +59,7 @@ const Reminder = ({ tasks }) => {
     useEffect(() => {
         const interval = setInterval(() => {
             tasks.forEach(task => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
                 if (task.reminder && !task.completed) {
                     const reminderTime = new Date(task.reminder).getTime();
                     const currentTime = new Date().getTime();
