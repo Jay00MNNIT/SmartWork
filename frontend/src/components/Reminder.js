@@ -81,6 +81,7 @@ const Reminder = ({ tasks }) => {
         }, 10000);  // Check every 10 seconds
 
         return () => clearInterval(interval);
+// eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tasks, audioContext, isPlaying]);
 
     // Dismiss alarm 
