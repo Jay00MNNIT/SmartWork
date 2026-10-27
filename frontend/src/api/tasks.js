@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getToken } from './auth';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/tasks';
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = `${BASE_URL}/api/tasks`;
 
 // Get auth header 
 const authHeader = () => ({
