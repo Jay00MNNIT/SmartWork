@@ -38,10 +38,17 @@ const Home = () => {
 
     const handleExit = () => {
         logout();
-        window.close();
-        // Fallback if window.close() doesn't work
-        window.location.href = 'about:blank';
-    };
+        navigate('/login');
+        setTimeout(() => {
+            toast.info(
+                '🤗 Goodbye Friend! To fully close app: swipe it away from recent apps!',
+                {
+                    autoClose: 5000,
+                    position: 'top-center'
+                }
+            );
+        }, 1000);
+    }
 
     // Handle keyboard navigation 
     const handleKeyDown = (e) => {
