@@ -36,6 +36,13 @@ const Home = () => {
         navigate('/login');
     };
 
+    const handleExit = () => {
+        logout();
+        window.close();
+        // Fallback if window.close() doesn't work
+        window.location.href = 'about:blank';
+    };
+
     // Handle keyboard navigation 
     const handleKeyDown = (e) => {
         if (!showSuggestions)   return;
@@ -207,7 +214,10 @@ const Home = () => {
                         {isDarkMode ? '☀️ Light Mode' : '🌛 Dark Mode'}
                     </button>
                     <button className="logout-btn" onClick={handleLogout}>
-                   🚪 Logout
+                        🚪 Logout
+                    </button>
+                    <button className="exit-btn" onClick={handleExit}>
+                        ❌ Exit
                     </button>
                 </div>
             </div>

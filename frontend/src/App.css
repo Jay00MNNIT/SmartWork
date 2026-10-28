@@ -990,3 +990,21 @@ body.light-mode .transcript {
 .install-btn:hover {
     background: #00cc66;
 }
+
+/* Exit Button */
+.exit-btn {
+    padding: 8px 20px;
+    background: #1a1a2e;
+    color: #ff4757;
+    border: 2px solid #ff4757;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.exit-btn:hover {
+    background: #ff4757;
+    color: white;
+}
