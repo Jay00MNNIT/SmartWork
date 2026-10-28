@@ -19,6 +19,8 @@ const Home = () => {
     const [filter, setFilter] = useState('all');
     const [category, setCategory] = useState('all');
     const [isDarkMode, setIsDarkMode] = useState(true);
+    const [installPrompt, setInstallPrompt] = useState(null);
+    const [showInstallBtn, setShowInstallBtn] = useState(false);
     const [showStats, setShowStats] = useState(false);
     const [user] = useState(getUser());
     const navigate = useNavigate();
@@ -73,6 +75,28 @@ const Home = () => {
         setSearchQuery(title);
         setShowSuggestions(false);
         setSelectedSuggestion(-1);
+    };
+
+    // PWA Install 
+    useEffect(() => {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            setInstallPrompt(e);
+            setShowInstallBtn(true);
+        });
+    }, []);
+
+    const handleInstallClick = () => {
+        if (installPrompt) {
+            installPrompt.prompt();
+            installPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    toast.success('✅ SmartWork installed successfully!');
+                }
+                setInstallPrompt(null);
+                setShowInstallBtn(false);
+            });
+        }
     };
 
     // Toggle dark/light mode
@@ -173,6 +197,11 @@ const Home = () => {
                 )}
                 <p>Stay organized, stay productive!</p>
                 <div className="header-buttons">
+                    {showInstallBtn && (
+                        <button className="install-btn" onClick={handleInstallClick}>
+                            📲 Install App
+                        </button>
+                    )}
                     <span className="user-name">👤 {user?.name}</span>
                     <button className="mode-toggle" onClick={toggleMode}>
                         {isDarkMode ? '☀️ Light Mode' : '🌛 Dark Mode'}

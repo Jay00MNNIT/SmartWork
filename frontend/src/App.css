@@ -973,3 +973,20 @@ body.light-mode .transcript {
 .eye-btn:hover {
     opacity: 0.7;
 }
+
+/* Install Button */
+.install-btn {
+    padding: 8px 20px;
+    background: #00ff88;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.install-btn:hover {
+    background: #00cc66;
+}
