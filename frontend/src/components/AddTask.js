@@ -10,7 +10,13 @@ const AddTask = ({ onAdd }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!title) return;
-        onAdd({ title, description, reminder, priority, category });
+        onAdd({ 
+            title, 
+            description, 
+            reminder: reminder ? new Date(reminder).toISOString() : null, 
+            priority, 
+            category 
+        });
         setTitle('');
         setDescription('');
         setReminder('');

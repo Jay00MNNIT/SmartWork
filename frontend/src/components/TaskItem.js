@@ -1,16 +1,23 @@
 import React, { useState } from 'react';
+// Convert saved date to the format the time inut needs 
+const toInputValue = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
 
 const TaskItem = ({ task, onDelete, onUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(task.title);
     const [editDescription, setEditDescription] = useState(task.description);
-    const [editReminder, setEditReminder] = useState(task.reminder);
+    const [editReminder, setEditReminder] = useState(toInputValue(task.reminder));
 
     const handleUpdate = () => {
         onUpdate(task._id, {
             title: editTitle,
             description: editDescription,
-            reminder: editReminder
+            reminder: editReminder ? new Date(editReminder).toISOString() : null
         });
         setIsEditing(false);
     };
@@ -53,7 +60,14 @@ const TaskItem = ({ task, onDelete, onUpdate }) => {
                     </p>
                     <p>{task.description}</p>
                     {task.reminder && (
-                        <p>Reminder: {new Date(task.reminder).toLocaleString()}</p>
+                        <p>⏰ Reminder: {new Date(task.reminder).toLocaleString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        })}</p>
                     )}
                     <div className="task-buttons">
                         <button onClick={() => onUpdate(task._id, { completed: !task.completed })}>
