@@ -155,9 +155,11 @@ router.post('/', authMiddleware, async (req, res) => {
  */
 router.put('/:id', authMiddleware, async (req, res) => {
     try {
-        const task = await Task.findByIdAndUpdate(
-            req.params.id,
-            req.body,
+        const update = { ...req.body };
+        if (req.body.reminder) update.notified = false;
+        const task = await Task.findOneAndUpdate(
+            { _id: req.params.id, userId: req.userId },
+            update,
             { new: true }
         );
         res.json(task);

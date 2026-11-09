@@ -31,6 +31,10 @@ const TaskSchema = new mongoose.Schema({
         enum: ['high', 'medium', 'low'],
         default: 'medium'
     },
+    notified: {
+        type: Boolean,
+        default: false
+    },
     category: {
         type: String,
         enum: ['study', 'work', 'personal', 'shopping', 'other'],

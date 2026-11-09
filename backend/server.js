@@ -4,6 +4,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+const pushRoutes = require('./routes/push');
+const startScheduler = require('./scheduler');
 
 dotenv.config();
 
@@ -35,11 +37,13 @@ const aiRoutes = require('./routes/ai');
 app.use('/api/tasks', taskRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/push', pushRoutes);
 
 // Connect MongoDB 
 mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log('✅ MongoDB Connected Successfully!');
+    startScheduler();
     app.listen(process.env.PORT || 5000, () => {
         console.log(`✅ SmartWork Server running on port ${process.env.PORT}`);
         console.log(`✅ API Docs available at http://localhost:5000/api-docs`);
