@@ -1,15 +1,15 @@
+require('dotenv').config();
 const cron = require('node-cron');
 const webpush = require('web-push');
 const Task = require('./models/Task');
 const Subscription = require('./models/Subscription');
 
-webpush.setVapidDetails(
+const startScheduler = () => {
+    webpush.setVapidDetails(
     process.env.VAPID_EMAIL,
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
 );
-
-const startScheduler = () => {
     // Runs every minute 
     cron.schedule('* * * * *', async () => {
         try {
