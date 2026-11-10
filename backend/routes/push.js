@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const Task = require('../models/Task');
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
@@ -20,6 +22,20 @@ router.post('/subscribe', authMiddleware, async (req, res) => {
         res.status(201).json({ message: 'Subscribed' });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+router.post('/complete', async (req, res) => {
+    try {
+        const { actionToken } = req.body;
+        const decoded = jwt.verify(actionToken, process.env.JWT_SECRET);
+        await Task.findOneAndUpdate(
+            { _id: decoded.taskId, userId: decoded.userId },
+            { completed: true}
+        );
+        res.json({ message: 'Completed' });
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid or expired token'});
     }
 });
 

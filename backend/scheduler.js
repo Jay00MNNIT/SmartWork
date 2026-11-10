@@ -1,4 +1,5 @@
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const cron = require('node-cron');
 const webpush = require('web-push');
 const Task = require('./models/Task');
@@ -24,7 +25,13 @@ const startScheduler = () => {
 
                 const payload = JSON.stringify({
                     title: '⏰ SmartWork Reminder',
-                    body: task.title 
+                    body: task.description ? `${task.title}\n${task.description}` : task.title,
+                    taskId: task._id,
+                    actionToken: jwt.sign(
+                        { taskId: task._id, userId: task.userId },
+                        process.env.JWT_SECRET,
+                        { expiresIn: '1d' }
+                    )
                 });
 
                 for (const sub of subs) {
