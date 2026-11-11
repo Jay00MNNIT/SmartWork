@@ -74,7 +74,7 @@ const Login = () => {
                         className="auth-btn"
                         disabled={loading}
                     >
-                        {loading ? '⏳ Logging in...' : '🔐 Login'}
+                        {loading ? '⏳ Waking up server, please wait up to 1 minute...' : '🔐 Login'}
                     </button>
                 </form>
                 <p className="auth-link">

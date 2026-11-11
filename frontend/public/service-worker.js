@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smartwork-cache-v1';
+const CACHE_NAME = 'smartwork-cache-v3';
 const urlsToCache = [
     '/',
     '/index.html',
@@ -64,27 +64,51 @@ self.addEventListener('activate', (event) => {
 
 // Push notifications 
 self.addEventListener('push', (event) => {
-    const options = {
-        body: event.data ? event.data.text() : 'Task reminder!',
-        icon: '/logo192.png',
-        badge: '/logo192.png',
-        vibrate: [100, 50, 100],
-        data: {
-            dateOfArrival: Date.now(),
-            primaryKey: 1
-        },
-        actions: [
-            {
-                action: 'complete',
-                title: '✅ Complete Task'
-            },
-            {
-                action: 'snooze',
-                title: '😴 Snooze'
-            }
-        ]
-    };
+    let data = { title: '⏰ SmartWork Reminder', body: 'Task reminder!' };
+    try {
+      if (event.data) data = event.data.json();
+    } catch (e) {
+        // keep default message 
+    }
+
     event.waitUntil(
-        self.registration.showNotification('SmartWork Reminder', options)
+        self.registration.showNotification(data.title, {
+          body: data.body,
+          icon: '/logo192.png',
+          badge: '/logo192.png',
+          vibrate: [300, 100, 300, 100, 300],
+          requireInteraction: true,
+          data: { taskId: data.taskId, actionToken: data.actionToken },
+          actions: [{ action: 'complete', title: '✅ Complete' }]
+        })
     );
+});
+
+// Handle taps on the notification 
+self.addEventListener('notificatonclick', (event) => {
+    event.notification.close();
+    const { actionToken } = event.notification.data || {};
+
+    if (event.action === 'complete' && actionToken) {
+        event.waitUntil(
+            fetch('https://smartwork-upt0.onrender.com/api/push/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ actionToken })
+            }).then((res) =>
+                self.registration.showNotification(
+                    res.ok ? '🎉 Task completed!' : '❌ Could not complete task',
+                    { icon: '/logo192.png' }
+                )
+            )
+        );
+    } else {
+        event.waitUntil(clients.openWindow('/'));
+    }
+});
+
+// Open the app when the notification is tapped 
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    event.waitUntil(clients.openWindow('/'));
 });

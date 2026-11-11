@@ -5,13 +5,13 @@ const API_URL = `${BASE_URL}/api/auth`;
 
 // Register 
 export const register = async (userData) => {
-    const response = await axios.post(`${API_URL}/register`, userData);
+    const response = await axios.post(`${API_URL}/register`, userData, { timeout: 90000 });
     return response.data;
 };
 
 // Login 
 export const login = async (userData) => {
-    const response = await axios.post(`${API_URL}/login`, userData);
+    const response = await axios.post(`${API_URL}/login`, userData, { timeout: 90000 });
     return response.data;
 };
 

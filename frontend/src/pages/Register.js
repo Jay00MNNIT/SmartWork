@@ -122,7 +122,7 @@ const Register = () => {
                         className="auth-btn"
                         disabled={loading}
                     >
-                        {loading ? '⏳ Registering...' : '✅ Register'}
+                        {loading ? '⏳ Registering, please wait up to 1 minute...' : '✅ Register'}
                     </button>
                 </form>
                 <p className="auth-link">
