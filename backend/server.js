@@ -30,6 +30,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customSiteTitle: 'SmartWork API Docs'
 }));
 
+app.get('/health', (req, res) => res.send('OK'));
+
 // Routes 
 const taskRoutes = require('./routes/tasks');
 const authRoutes = require('./routes/auth');
