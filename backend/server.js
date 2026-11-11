@@ -30,7 +30,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customSiteTitle: 'SmartWork API Docs'
 }));
 
-app.get('/health', (req, res) => res.send('OK'));
+app.get('/health', (req, res) => res.send('OK')); 
 
 // Routes 
 const taskRoutes = require('./routes/tasks');
@@ -45,7 +45,11 @@ app.use('/api/push', pushRoutes);
 mongoose.connect(process.env.MONGO_URI)
 .then(() => {
     console.log('✅ MongoDB Connected Successfully!');
-    startScheduler();
+    try {
+        startScheduler();
+    } catch (error) {
+        console.error('Scheduler failed to start:', error.message);
+    }
     app.listen(process.env.PORT || 5000, () => {
         console.log(`✅ SmartWork Server running on port ${process.env.PORT}`);
         console.log(`✅ API Docs available at http://localhost:5000/api-docs`);
