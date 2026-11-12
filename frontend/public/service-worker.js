@@ -1,114 +1,83 @@
-const CACHE_NAME = 'smartwork-cache-v3';
+const CACHE_NAME = 'smartwork-cache-v4';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/static/js/bundle.js',
-    '/static/css/main.css',
-    '/manifest.json',
-    '/logo192.png',
-    '/logo512.png'
+    '/manifest.json'
 ];
 
 // Install service worker 
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('✅ Cache opened');
-            return cache.addAll(urlsToCache);
-        })
-    );
+  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(urlsToCache.map((url) => cache.add(url)))
+    )
+  );
 });
 
-// Fetch from cache 
-self.addEventListener('fetch', (event) => {
-    event.respondwith(
-        caches.match(event.request).then((response) => {
-            // Return cached version or fetch from network 
-            if (response) {
-                return response;
-            }
-            return fetch(event.request).then((response) => {
-                // Check valid response 
-                if (!response || response.status !== 200 || response.type !== 'basic') {
-                    return response;
-                }
-                // Cache new response 
-                const responseToCache = response.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseToCache);
-                });
-                return response;
-            });
-        }).catch(() => {
-            // Offline fallback 
-            return caches.match('/index.html');
-        })
-    );
-});
-
-// Activate service worker 
 self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('✅ Deleting old cache:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
+  event.waitUntil(
+    caches.keys().then((names) =>
+      Promise.all(
+        names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
+
+// Network first, cache as backup (so you always get the newest app)
+self.addEventListener('fetch', (event) => {
+    if (event.request.method !== 'GET') return;
+    if (!event.request.url.startsWith(self.location.origin)) return;
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          return response;
         })
+        .catch(() => caches.match(event.request).then((r) => r || caches.match('/index.html')))
     );
 });
 
-// Push notifications 
 self.addEventListener('push', (event) => {
-    let data = { title: '⏰ SmartWork Reminder', body: 'Task reminder!' };
-    try {
-      if (event.data) data = event.data.json();
-    } catch (e) {
-        // keep default message 
-    }
+  let data = { title: '⏰ SmartWork Reminder', body: 'Task reminder!'};
+  try {
+    if (event.data) data = event.data.json();
+  } catch (e) {}
 
     event.waitUntil(
-        self.registration.showNotification(data.title, {
-          body: data.body,
-          icon: '/logo192.png',
-          badge: '/logo192.png',
-          vibrate: [300, 100, 300, 100, 300],
-          requireInteraction: true,
-          data: { taskId: data.taskId, actionToken: data.actionToken },
-          actions: [{ action: 'complete', title: '✅ Complete' }]
-        })
+      self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: '/logo192.png',
+        badge: '/logo192.png',
+        vibrate: [300, 100, 300, 100, 300],
+        requireInteraction: true,
+        data: { taskId: data.taskId, actionToken: data.actionToken },
+        actions: [{ action: 'complete', title: '✅ Complete' }]
+      })
     );
-});
+  });
 
 // Handle taps on the notification 
 self.addEventListener('notificatonclick', (event) => {
-    event.notification.close();
-    const { actionToken } = event.notification.data || {};
+  event.notification.close();
+  const { actionToken } = event.notification.data || {};
 
-    if (event.action === 'complete' && actionToken) {
-        event.waitUntil(
-            fetch('https://smartwork-upt0.onrender.com/api/push/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ actionToken })
-            }).then((res) =>
-                self.registration.showNotification(
-                    res.ok ? '🎉 Task completed!' : '❌ Could not complete task',
-                    { icon: '/logo192.png' }
-                )
-            )
-        );
+  if (event.action === 'complete' && actionToken) {
+    event.waitUntil(
+      fetch('https://smartwork-upt0.onrender.com/api/push/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionToken })
+      }).then((res) =>
+        self.registration.showNotification(
+          res.ok ? '🎉 Task completed!' : '❌ Could not complete task',
+          { icon: '/logo192.png' }
+        )
+      )
+    );
     } else {
-        event.waitUntil(clients.openWindow('/'));
+      event.waitUntil(clients.openWindow('/'));
     }
-});
-
-// Open the app when the notification is tapped 
-self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-    event.waitUntil(clients.openWindow('/'));
-});
+  });
