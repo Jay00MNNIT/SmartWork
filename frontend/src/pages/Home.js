@@ -10,7 +10,7 @@ import AISuggestion from '../components/AISuggestion';
 import { getTasks, addTask, updateTask, deleteTask } from '../api/tasks';
 import { getUser, logout } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
-import { enableNotifications } from '../api/push';
+import { enableNotifications, disableNotifications, isSubscribed } from '../api/push';
 
 const Home = () => {
     const [tasks, setTasks] = useState([]);
@@ -24,11 +24,16 @@ const Home = () => {
     const [showInstallBtn, setShowInstallBtn] = useState(false);
     const [showStats, setShowStats] = useState(false);
     const [user] = useState(getUser());
+    const [alertsOn, setAlertsOn] = useState(false);
     const navigate = useNavigate();
 
     // Fetch all tasks 
     useEffect(() => {
         fetchTasks();
+    }, []);
+
+    useEffect(() => {
+        isSubscribed().then(setAlertsOn).catch(() => setAlertsOn(false));
     }, []);
 
     // Logout handler 
@@ -114,10 +119,17 @@ const Home = () => {
         }
     };
 
-    const handleEnableNotifications = async () => {
+    const handleToggleNotifications = async () => {
         try {
-            await enableNotifications();
-            toast.success('🔔 Notifications enabled on this device!');
+            if (alertsOn) {
+                await disableNotifications();
+                setAlertsOn(false);
+                toast.info('🔕 Notifications disabled on this device');
+            } else {
+                await enableNotifications();
+                setAlertsOn(true);
+                toast.success('🔔 Notifications enabled on this device!');
+            }
         } catch (error) {
             toast.error(`❌ ${error.message}`);
         }
@@ -227,9 +239,13 @@ const Home = () => {
                         </button>
                     )}
                     <span className="user-name">👤 {user?.name}</span>
-                    <button className="install-btn" onClick={handleEnableNotifications}>
-                        🔔 Enable Alerts
+                    <button 
+                        className={alertsOn ? 'exit-btn' : 'install-btn'}
+                        onClick={handleToggleNotifications}
+                    >
+                        {alertsOn ? '🔕 Disable Alerts' : '🔔 Enable Alerts'} 
                     </button>
+                    
                     <button className="mode-toggle" onClick={toggleMode}>
                         {isDarkMode ? '☀️ Light Mode' : '🌛 Dark Mode'}
                     </button>

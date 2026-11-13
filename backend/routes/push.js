@@ -39,4 +39,17 @@ router.post('/complete', async (req, res) => {
     }
 });
 
+// Remove a device subscription 
+router.post('/unsubscribe', authMiddleware, async (req, res) => {
+    try {
+        await Subscription.deleteOne({
+            endpoint: req.body.endpoint,
+            userId: req.userId
+        });
+        res.json({ message: 'Unsubscribed' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

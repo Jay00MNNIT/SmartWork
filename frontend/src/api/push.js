@@ -46,3 +46,33 @@ export const enableNotifications = async () => {
         throw new Error('Could not save subscription');
     }
 };
+
+// Check if this device is already subscribed 
+export const isSubscribed = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window))
+        return false;
+    if (Notification.permission !== 'granted')
+        return false;
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    return !!subscription;
+};
+
+// Turn notifications off for this device 
+export const disableNotifications = async () => {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    if (!subscription)  
+        return;
+
+    await fetch(`${BASE_URL}/api/push/unsubscribe`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`
+        },
+        body: JSON.stringify({ endpoint: subscription.endpoint })
+    });
+
+    await subscription.unsubscribe();
+};
